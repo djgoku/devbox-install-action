@@ -109,7 +109,7 @@ runs:
           GTAR=$(which gtar)
           sudo mv $GTAR $GTAR.orig
           echo "#!/bin/sh" >> $GTAR
-          echo 'exec sudo $GTAR.orig "$@"' >> $GTAR
+          echo "exec sudo $GTAR.orig \"$@\"" >> $GTAR
           sudo chmod +x $GTAR
         elif [ "$RUNNER_OS" == "Linux" ]; then
           mkdir -p ~/.cache
