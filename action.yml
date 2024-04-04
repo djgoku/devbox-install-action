@@ -1,30 +1,30 @@
-name: 'devbox installer'
-description: 'Install Devbox in your CICD workflow'
+name: "devbox installer"
+description: "Install Devbox in your CICD workflow"
 branding:
-  icon: 'box'
-  color: 'purple'
+  icon: "box"
+  color: "purple"
 
 inputs:
   project-path: # path to folder
-    description: 'Project path to devbox.json. Default to the root directory of the repository.'
-    default: '.'
+    description: "Project path to devbox.json. Default to the root directory of the repository."
+    default: "."
   enable-cache: # 'true' or 'false'
-    description: 'Caching the entire Nix store in github based on your devbox.json'
-    default: 'false'
+    description: "Caching the entire Nix store in github based on your devbox.json"
+    default: "false"
   refresh-cli: # 'true' or 'false'
-    description: 'Specify whether the CLI should be redownloaded'
-    default: 'false'
+    description: "Specify whether the CLI should be redownloaded"
+    default: "false"
   devbox-version: # version of the devbox cli
-    description: 'Specify devbox CLI version you want to pin to. Default to latest'
-    default: ''
+    description: "Specify devbox CLI version you want to pin to. Default to latest"
+    default: ""
   sha256-checksum: # the expected SHA256 checksum of the devbox binary.
-    description: 'Specify an explicit checksum for the devbox binary. For extra security on top of the existing checks in the devbox launch script'
+    description: "Specify an explicit checksum for the devbox binary. For extra security on top of the existing checks in the devbox launch script"
   disable-nix-access-token: # 'true' or 'false'
-    description: 'Disable configuration of nix access-tokens with the GitHub token used in the workflow'
-    default: 'false'
+    description: "Disable configuration of nix access-tokens with the GitHub token used in the workflow"
+    default: "false"
   skip-nix-installation: # 'true' or 'false'
-    description: 'Skip the installation of nix'
-    default: 'false'
+    description: "Skip the installation of nix"
+    default: "false"
 
 runs:
   using: "composite"
@@ -105,8 +105,8 @@ runs:
       if: inputs.enable-cache == 'true'
       shell: bash
       run: |
-        if [ "$RUNNER_OS" == "macOS" ]; then
-          GTAR=$(which gtar)
+        GTAR=$(which gtar)
+        if [ "$RUNNER_OS" == "macOS" ] && [ "$GTAR" == "/usr/local/bin/gtar"]; then
           sudo mv $GTAR $GTAR.orig
           echo "#!/bin/sh" >> $GTAR
           echo "exec sudo $GTAR.orig \"$@\"" >> $GTAR
@@ -128,7 +128,7 @@ runs:
 
     - name: Install nix
       if: inputs.skip-nix-installation == 'false'
-      uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e  # v9
+      uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
       with:
         logger: pretty
         extra-conf: experimental-features = ca-derivations fetch-closure
@@ -174,8 +174,6 @@ runs:
         if [ "$RUNNER_OS" == "macOS" ]; then
           if [ -f "/usr/local/bin/gtar.orig" ]; then
             sudo mv /usr/local/bin/gtar.orig /usr/local/bin/gtar
-          else
-            sudo mv /opt/homebrew/bin/gtar.orig /opt/homebrew/bin/gtar
           fi
         elif [ "$RUNNER_OS" == "Linux" ]; then
           rm ~/.local/bin/tar
